@@ -1,0 +1,34 @@
+{@jp.classmethod.samplerelyingparty.web.LoginUser loginUser}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Sample RP</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.2/css/bulma.min.css">
+</head>
+<body>
+<section class="section">
+    <div class="container">
+        {#if loginUser.isLoggedIn}
+            <h1 class="title">
+                ログイン済み : {loginUser.getUsername}
+            </h1>
+            <form action="/logout" method="post">
+                <button type="submit" class="button is-warning">ログアウト</button>
+            </form>
+
+        {#else}
+            <h1 class="title">
+                未ログイン
+            </h1>
+            <div class="control">
+                <form action="/login" method="post">
+                    <button type="submit" class="button is-info">ログイン</button>
+                </form>
+            </div>
+        {/if}
+    </div>
+</section>
+</body>
+</html>
