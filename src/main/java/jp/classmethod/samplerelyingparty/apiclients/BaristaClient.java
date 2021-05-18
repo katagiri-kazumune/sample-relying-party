@@ -1,4 +1,4 @@
-package jp.classmethod.samplerelyingparty.web.oauth;
+package jp.classmethod.samplerelyingparty.apiclients;
 
 import com.jayway.jsonpath.JsonPath;
 import java.net.URI;
@@ -7,31 +7,30 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
-import java.util.Base64;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.UUID;
 import javax.enterprise.context.ApplicationScoped;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.UriBuilder;
-import jp.classmethod.samplerelyingparty.config.ApplicationConfiguration;
+import jp.classmethod.samplerelyingparty.config.BaristaAuthorizeConfiguration;
 import jp.classmethod.samplerelyingparty.exception.AuthorizationException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import jp.classmethod.samplerelyingparty.web.oauth.AuthorizationResult;
 
 @ApplicationScoped
-public class OAuthClient {
+public class BaristaClient {
 
-    private final Logger log = LoggerFactory.getLogger(getClass());
+    private static final String STATE_KEY = BaristaClient.class.getName() + "_STATE";
 
-    private static final String STATE_KEY = OAuthClient.class.getName() + "_STATE";
+    private static final String REDIRECT_URI_KEY = BaristaClient.class.getName() + "_REDIRECT_URI";
 
-    private static final String REDIRECT_URI_KEY = OAuthClient.class.getName() + "REDIRECT_URI";
+    private static final HttpResponse.BodyHandler<String> BODY_HANDLER =
+            HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8);
 
-    private final ApplicationConfiguration applicationConfiguration;
+    private final BaristaAuthorizeConfiguration baristaAuthorizeConfiguration;
 
-    public OAuthClient(ApplicationConfiguration applicationConfiguration) {
-        this.applicationConfiguration = applicationConfiguration;
+    public BaristaClient(BaristaAuthorizeConfiguration baristaAuthorizeConfiguration) {
+        this.baristaAuthorizeConfiguration = baristaAuthorizeConfiguration;
     }
 
     /**
@@ -47,9 +46,9 @@ public class OAuthClient {
         session.setAttribute(STATE_KEY, state);
         session.setAttribute(REDIRECT_URI_KEY, redirectUri);
 
-        return UriBuilder.fromUri(applicationConfiguration.authorizationEndpoint)
+        return UriBuilder.fromUri(baristaAuthorizeConfiguration.authorizationEndpoint)
                 .queryParam("state", state)
-                .queryParam("client_id", applicationConfiguration.clientId)
+                .queryParam("client_id", baristaAuthorizeConfiguration.clientId)
                 .queryParam("response_type", "code")
                 .queryParam("redirect_uri", redirectUri)
                 .toTemplate();
@@ -64,7 +63,7 @@ public class OAuthClient {
      * @return レスポンス
      * @throws AuthorizationException 呼び出しに失敗した
      */
-    public AuthorizationCodeGrantResponse callTokenEndpoint(
+    public AuthorizationResult callTokenEndpoint(
             String code, String state, HttpServletRequest request) {
         var session = request.getSession(true);
         if (Objects.equals(session.getAttribute(STATE_KEY), state) == false) {
@@ -81,43 +80,38 @@ public class OAuthClient {
                             code,
                             session.getAttribute(REDIRECT_URI_KEY));
             var tokenEndpointRequest =
-                    HttpRequest.newBuilder(new URI(applicationConfiguration.tokenEndpoint))
+                    HttpRequest.newBuilder(URI.create(baristaAuthorizeConfiguration.tokenEndpoint))
                             .POST(HttpRequest.BodyPublishers.ofString(bodyString))
                             .header(
                                     "Authorization",
-                                    buildAuthorizationValue(
-                                            applicationConfiguration.clientId,
-                                            applicationConfiguration.clientSecret))
+                                    HeaderHelper.buildAuthorizationValue(
+                                            baristaAuthorizeConfiguration.clientId,
+                                            baristaAuthorizeConfiguration.clientSecret))
                             .header("Content-Type", "application/x-www-form-urlencoded")
                             .timeout(Duration.ofSeconds(10))
                             .build();
-            var bodyHandler = HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8);
             var response =
                     HttpClient.newBuilder()
                             .version(HttpClient.Version.HTTP_1_1)
                             .build()
-                            .send(tokenEndpointRequest, bodyHandler);
+                            .send(tokenEndpointRequest, BODY_HANDLER);
             if (response.statusCode() != 200) {
                 throw new AuthorizationException(400, "invalid request");
             }
+
             var responseBody = response.body();
-            var authorizationCodeGrantResponse =
-                    new AuthorizationCodeGrantResponse(
+            var authorizationResult =
+                    new AuthorizationResult(
                             JsonPath.read(responseBody, "$.access_token"),
                             JsonPath.read(responseBody, "$.id_token"),
                             JsonPath.read(responseBody, "$.refresh_token"));
             session.removeAttribute(STATE_KEY);
             session.removeAttribute(REDIRECT_URI_KEY);
-            return authorizationCodeGrantResponse;
+            return authorizationResult;
+        } catch (AuthorizationException e) {
+            throw e;
         } catch (Exception e) {
             throw new AuthorizationException(503, e.getMessage(), e);
         }
-    }
-
-    private static String buildAuthorizationValue(String username, String password) {
-        return "Basic "
-                + Base64.getEncoder()
-                        .encodeToString(
-                                (username + ":" + password).getBytes(StandardCharsets.UTF_8));
     }
 }

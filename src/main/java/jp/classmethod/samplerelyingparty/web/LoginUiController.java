@@ -6,20 +6,20 @@ import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Context;
-import jp.classmethod.samplerelyingparty.web.oauth.OAuthClient;
+import jp.classmethod.samplerelyingparty.apiclients.BaristaClient;
 
 /** ログイン UI Controller. */
 @Path("/login")
 public class LoginUiController {
 
-    private final OAuthClient oAuthClient;
+    private final BaristaClient baristaClient;
 
     @Context private HttpServletRequest request;
 
     @Context private HttpServletResponse httpServletResponse;
 
-    public LoginUiController(OAuthClient oAuthClient) {
-        this.oAuthClient = oAuthClient;
+    public LoginUiController(BaristaClient baristaClient) {
+        this.baristaClient = baristaClient;
     }
 
     @POST
@@ -30,7 +30,7 @@ public class LoginUiController {
         } else {
             var redirectUri = "http://localhost:8888/oauth/callback";
             httpServletResponse.sendRedirect(
-                    oAuthClient.buildAuthorizationRequest(redirectUri, request));
+                    baristaClient.buildAuthorizationRequest(redirectUri, request));
         }
     }
 }
