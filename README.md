@@ -11,7 +11,7 @@ barista に Client を登録します。
 を登録しておいてください)
 
 事前にユーザーを登録しておきます。
-MFA 設定画面を表示する権限として `BARISTA_MFA_CONFIGURABLE` を保持してください。
+MFA 設定画面を表示する権限として `BARISTA_MFA_CONFIGURABLE` を設定してください。
 
 barista で MFA が有効な設定しておきます。
 (`barista.mfa.email-enabled=true` 等にしてください)
