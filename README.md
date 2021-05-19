@@ -2,6 +2,8 @@
 
 ローカルに barista を構築します。
 
+## Client 登録
+
 barista に Client を登録します。
 (その Client の redirect_uri に
 
@@ -10,11 +12,38 @@ barista に Client を登録します。
 
 を登録しておいてください)
 
+## ユーザー登録
+
 事前にユーザーを登録しておきます。
 MFA 設定画面を表示する権限として `BARISTA_MFA_CONFIGURABLE` を設定してください。
 
+## barista 設定
+
 barista で MFA が有効な設定しておきます。
 (`barista.mfa.email-enabled=true` 等にしてください)
+
+DoSignup 後に実行するアクション(`barista.signup.post-signup-action`) に、
+`http://localhost:8888/signup/callback`
+を設定します。
+
+DoSignup 時に新規ユーザーに付与する権限(`barista.signup.signup-authorities`) に、
+`BARISTA_MFA_CONFIGURABLE`
+を追加設定します(これをしないと signup 直後に MFA 設定画面に遷移できません)。
+
+MFA 設定画面(`mfa-registration.html`) に以下を設定します
+
+```js
+<script type="text/javascript" th:inline="javascript" th:if="${emailRegistered}">
+	window.onload = function() {
+		const redirectUri = "[(${session[T(jp.classmethod.aws.barista.web.utils.ClientIdDetectionFilter).REDIRECT_URI] ?: ''})]";
+		if(redirectUri !== '') {
+			setTimeout(function(){location.href = redirectUri}, 1500);
+		}
+	};
+</script>
+```
+
+## barista 起動
 
 barista を起動します。
 

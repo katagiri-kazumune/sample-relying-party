@@ -49,6 +49,19 @@ public class AuthorizationResult implements Serializable {
         session.setAttribute(SESSION_KEY, authorizationResult);
     }
 
+    /**
+     * Session から削除.
+     *
+     * @param request request
+     */
+    public static void removeSession(HttpServletRequest request) {
+        var session = request.getSession(false);
+        if (session == null) {
+            return;
+        }
+        session.removeAttribute(SESSION_KEY);
+    }
+
     public String getUsername() {
         if (idToken != null) {
             return getUsernameForIdToken();

@@ -50,6 +50,19 @@ public class LoginUser implements Serializable {
     }
 
     /**
+     * Session から削除.
+     *
+     * @param request request
+     */
+    public static void removeSession(HttpServletRequest request) {
+        var session = request.getSession(false);
+        if (session == null) {
+            return;
+        }
+        session.removeAttribute(SESSION_KEY);
+    }
+
+    /**
      * ログインしているか？
      *
      * @return ログインしている場合、true

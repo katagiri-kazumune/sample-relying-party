@@ -1,6 +1,12 @@
 package jp.classmethod.samplerelyingparty.web.mfaconfig;
 
-import jp.classmethod.samplerelyingparty.apiclients.BaristaClient;
+import java.io.IOException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.UriBuilder;
 import jp.classmethod.samplerelyingparty.apiclients.GetUserApiClient;
 import jp.classmethod.samplerelyingparty.config.BaristaAuthorizeConfiguration;
 import jp.classmethod.samplerelyingparty.config.BaristaUiConfiguration;
@@ -9,15 +15,6 @@ import jp.classmethod.samplerelyingparty.web.LoginUser;
 import jp.classmethod.samplerelyingparty.web.oauth.AuthorizationResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.UriBuilder;
-import java.io.IOException;
 
 /** MFA 設定完了した後の Callback. */
 @Path("/mfa-config")
@@ -44,20 +41,18 @@ public class CallbackController {
         this.baristaAuthorizeConfiguration = baristaAuthorizeConfiguration;
     }
 
-    /**
-     * MFA 設定後の callback.
-     */
+    /** MFA 設定後の callback. */
     @GET
     @Path("/callback")
     public void callback() throws IOException {
         try {
             var authorizationResult = AuthorizationResult.fromSession(request);
-            if(authorizationResult == null) {
+            if (authorizationResult == null) {
                 // Session 上に認証情報が存在しない場合、TOP 画面へ
                 httpServletResponse.sendRedirect("/");
                 return;
             }
-            
+
             var username = authorizationResult.getUsername();
             if (getUserApiClient.hasMfaSetting(username) == false) {
                 // まだ有効でない場合、MFA 設定画面にリダイレクト
