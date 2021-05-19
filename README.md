@@ -64,6 +64,9 @@ export BARISTA_UI_GET_MFA_REGISTRATION_FORM_ENDPOINT=${GetMfaRegistrationForm �
 
 ブラウザで `http://localhost:8888` にアクセスすると参照できます。
 
+ユーザーに EMAIL の MFA 設定がある時にログイン状態になります。
+(EMAIL の MFA 設定が無いと MFA 設定画面に遷移します)
+
 # フォーマット
 
 ```sh
