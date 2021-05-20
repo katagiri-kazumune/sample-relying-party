@@ -14,15 +14,13 @@ import jp.classmethod.samplerelyingparty.exception.AuthorizationException;
 import jp.classmethod.samplerelyingparty.web.LoginUser;
 import jp.classmethod.samplerelyingparty.web.oauth.AuthorizationResult;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 /** MFA 設定完了した後の Callback. */
+@Slf4j
 @Path("/mfa-config")
 @RequiredArgsConstructor
 public class CallbackController {
-
-    private final Logger log = LoggerFactory.getLogger(getClass());
 
     private final GetUserApiClient getUserApiClient;
 

@@ -15,15 +15,13 @@ import jp.classmethod.samplerelyingparty.config.BaristaUiConfiguration;
 import jp.classmethod.samplerelyingparty.exception.AuthorizationException;
 import jp.classmethod.samplerelyingparty.web.LoginUser;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 /** barista でログイン した後の Callback. */
+@Slf4j
 @Path("/oauth")
 @RequiredArgsConstructor
 public class CallbackController {
-
-    private final Logger log = LoggerFactory.getLogger(getClass());
 
     private final BaristaClient baristaClient;
 
@@ -53,11 +51,12 @@ public class CallbackController {
             var username = authorizationResult.getUsername();
 
             if (getUserApiClient.hasMfaSetting(username) == false) {
-                // MFA 設定画面にリダイレクト
+                // MFA 未設定の場合、MFA 設定画面にリダイレクト
                 httpServletResponse.sendRedirect(buildRedirectUri());
                 return;
             }
 
+            // Session 上ログイン状態にして、TOP 画面へ遷移
             LoginUser.storeSession(username, request);
             httpServletResponse.sendRedirect("/");
         } catch (AuthorizationException e) {

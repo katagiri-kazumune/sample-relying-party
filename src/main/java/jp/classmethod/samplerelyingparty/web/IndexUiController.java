@@ -8,8 +8,10 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import lombok.extern.slf4j.Slf4j;
 
 /** Index UI Controller. */
+@Slf4j
 @Path("")
 public class IndexUiController {
 
@@ -24,6 +26,7 @@ public class IndexUiController {
     @GET
     @Produces(MediaType.TEXT_HTML)
     public TemplateInstance index() {
+        log.info("call index.");
         return Templates.index(LoginUser.fromSession(request));
     }
 }
