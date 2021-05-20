@@ -9,9 +9,11 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriBuilder;
 import jp.classmethod.samplerelyingparty.config.BaristaAuthorizeConfiguration;
 import jp.classmethod.samplerelyingparty.config.BaristaUiConfiguration;
+import lombok.RequiredArgsConstructor;
 
 /** MFA 設定画面の Controller. */
 @Path("/mfa-config")
+@RequiredArgsConstructor
 public class IndexController {
 
     private final BaristaUiConfiguration baristaUiConfiguration;
@@ -22,21 +24,14 @@ public class IndexController {
 
     @Context private HttpServletResponse httpServletResponse;
 
-    public IndexController(
-            BaristaUiConfiguration baristaUiConfiguration,
-            BaristaAuthorizeConfiguration baristaAuthorizeConfiguration) {
-        this.baristaUiConfiguration = baristaUiConfiguration;
-        this.baristaAuthorizeConfiguration = baristaAuthorizeConfiguration;
-    }
-
     @GET
     public void index() throws IOException {
         httpServletResponse.sendRedirect(buildRedirectUri());
     }
 
     private String buildRedirectUri() {
-        return UriBuilder.fromUri(baristaUiConfiguration.getMfaRegistrationFormEndpoint)
-                .queryParam("client_id", baristaAuthorizeConfiguration.clientId)
+        return UriBuilder.fromUri(baristaUiConfiguration.getGetMfaRegistrationFormEndpoint())
+                .queryParam("client_id", baristaAuthorizeConfiguration.getClientId())
                 .queryParam("redirect_uri", "http://localhost:8888/")
                 .toTemplate();
     }

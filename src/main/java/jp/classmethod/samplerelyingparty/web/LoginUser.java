@@ -3,8 +3,10 @@ package jp.classmethod.samplerelyingparty.web;
 import java.io.Serializable;
 import java.util.Objects;
 import javax.servlet.http.HttpServletRequest;
+import lombok.Value;
 
 /** ログインユーザ情報. */
+@Value
 public class LoginUser implements Serializable {
 
     private static final LoginUser NO_LOGIN_USER = new LoginUser(null);
@@ -12,11 +14,7 @@ public class LoginUser implements Serializable {
     private static final String SESSION_KEY = LoginUser.class.getName();
 
     /** username. */
-    private final String username;
-
-    public LoginUser(String username) {
-        this.username = username;
-    }
+    String username;
 
     /**
      * Session 上のインスタンス取得.
@@ -69,9 +67,5 @@ public class LoginUser implements Serializable {
      */
     public boolean isLoggedIn() {
         return Objects.nonNull(username);
-    }
-
-    public String getUsername() {
-        return username;
     }
 }

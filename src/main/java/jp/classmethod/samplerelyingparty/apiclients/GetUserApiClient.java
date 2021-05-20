@@ -14,7 +14,9 @@ import javax.enterprise.context.ApplicationScoped;
 import jp.classmethod.samplerelyingparty.config.BaristaApiConfiguration;
 import jp.classmethod.samplerelyingparty.exception.ApiException;
 import jp.classmethod.samplerelyingparty.exception.AuthorizationException;
+import lombok.RequiredArgsConstructor;
 
+@RequiredArgsConstructor
 @ApplicationScoped
 public class GetUserApiClient {
 
@@ -27,13 +29,6 @@ public class GetUserApiClient {
 
     private final BaristaApiConfiguration baristaApiConfiguration;
 
-    public GetUserApiClient(
-            ClientAuthenticationClient clientAuthenticationClient,
-            BaristaApiConfiguration baristaApiConfiguration) {
-        this.clientAuthenticationClient = clientAuthenticationClient;
-        this.baristaApiConfiguration = baristaApiConfiguration;
-    }
-
     /**
      * MFA 設定済みユーザーか？
      *
@@ -44,7 +39,9 @@ public class GetUserApiClient {
      */
     public boolean hasMfaSetting(String username) {
         var accessToken = clientAuthenticationClient.getClientAccessToken();
-        var uri = String.format(Locale.ENGLISH, baristaApiConfiguration.getUserEndpoint, username);
+        var uri =
+                String.format(
+                        Locale.ENGLISH, baristaApiConfiguration.getGetUserEndpoint(), username);
         var apiResult = callApi(uri, accessToken);
         return (Boolean) apiResult.get("mfa_email_enabled"); // 必須項目なので手を抜いた
     }

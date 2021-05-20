@@ -16,7 +16,9 @@ import javax.ws.rs.core.UriBuilder;
 import jp.classmethod.samplerelyingparty.config.BaristaAuthorizeConfiguration;
 import jp.classmethod.samplerelyingparty.exception.AuthorizationException;
 import jp.classmethod.samplerelyingparty.web.oauth.AuthorizationResult;
+import lombok.RequiredArgsConstructor;
 
+@RequiredArgsConstructor
 @ApplicationScoped
 public class BaristaClient {
 
@@ -28,10 +30,6 @@ public class BaristaClient {
             HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8);
 
     private final BaristaAuthorizeConfiguration baristaAuthorizeConfiguration;
-
-    public BaristaClient(BaristaAuthorizeConfiguration baristaAuthorizeConfiguration) {
-        this.baristaAuthorizeConfiguration = baristaAuthorizeConfiguration;
-    }
 
     /**
      * 認可リクエスト作成.
@@ -46,9 +44,9 @@ public class BaristaClient {
         session.setAttribute(STATE_KEY, state);
         session.setAttribute(REDIRECT_URI_KEY, redirectUri);
 
-        return UriBuilder.fromUri(baristaAuthorizeConfiguration.authorizationEndpoint)
+        return UriBuilder.fromUri(baristaAuthorizeConfiguration.getAuthorizationEndpoint())
                 .queryParam("state", state)
-                .queryParam("client_id", baristaAuthorizeConfiguration.clientId)
+                .queryParam("client_id", baristaAuthorizeConfiguration.getClientId())
                 .queryParam("response_type", "code")
                 .queryParam("redirect_uri", redirectUri)
                 .toTemplate();
@@ -80,13 +78,14 @@ public class BaristaClient {
                             code,
                             session.getAttribute(REDIRECT_URI_KEY));
             var tokenEndpointRequest =
-                    HttpRequest.newBuilder(URI.create(baristaAuthorizeConfiguration.tokenEndpoint))
+                    HttpRequest.newBuilder(
+                                    URI.create(baristaAuthorizeConfiguration.getTokenEndpoint()))
                             .POST(HttpRequest.BodyPublishers.ofString(bodyString))
                             .header(
                                     "Authorization",
                                     HeaderHelper.buildAuthorizationValue(
-                                            baristaAuthorizeConfiguration.clientId,
-                                            baristaAuthorizeConfiguration.clientSecret))
+                                            baristaAuthorizeConfiguration.getClientId(),
+                                            baristaAuthorizeConfiguration.getClientSecret()))
                             .header("Content-Type", "application/x-www-form-urlencoded")
                             .timeout(Duration.ofSeconds(10))
                             .build();

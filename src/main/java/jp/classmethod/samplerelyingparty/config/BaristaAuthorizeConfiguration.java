@@ -1,15 +1,21 @@
 package jp.classmethod.samplerelyingparty.config;
 
 import io.quarkus.arc.config.ConfigProperties;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
+@Getter
+@Setter
+@NoArgsConstructor
 @ConfigProperties(prefix = "barista.authorize")
 public class BaristaAuthorizeConfiguration {
 
-    public String authorizationEndpoint;
+    private String authorizationEndpoint;
 
-    public String clientId;
+    private String clientId;
 
-    public String clientSecret;
+    private String clientSecret;
 
-    public String tokenEndpoint;
+    private String tokenEndpoint;
 }

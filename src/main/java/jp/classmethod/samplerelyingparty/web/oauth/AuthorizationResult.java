@@ -5,23 +5,19 @@ import java.io.Serializable;
 import java.text.ParseException;
 import javax.servlet.http.HttpServletRequest;
 import jp.classmethod.samplerelyingparty.exception.AuthorizationException;
+import lombok.Value;
 
 /** 認証結果. */
+@Value
 public class AuthorizationResult implements Serializable {
 
     private static final String SESSION_KEY = AuthorizationResult.class.getName();
 
-    private final String accessToken;
+    String accessToken;
 
-    private final String idToken;
+    String idToken;
 
-    private final String refreshToken;
-
-    public AuthorizationResult(String accessToken, String idToken, String refreshToken) {
-        this.accessToken = accessToken;
-        this.idToken = idToken;
-        this.refreshToken = refreshToken;
-    }
+    String refreshToken;
 
     /**
      * Session 上のインスタンス取得.

@@ -7,9 +7,11 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Context;
 import jp.classmethod.samplerelyingparty.apiclients.BaristaClient;
+import lombok.RequiredArgsConstructor;
 
 /** ログイン UI Controller. */
 @Path("/login")
+@RequiredArgsConstructor
 public class LoginUiController {
 
     private final BaristaClient baristaClient;
@@ -17,10 +19,6 @@ public class LoginUiController {
     @Context private HttpServletRequest request;
 
     @Context private HttpServletResponse httpServletResponse;
-
-    public LoginUiController(BaristaClient baristaClient) {
-        this.baristaClient = baristaClient;
-    }
 
     @POST
     public void login() throws IOException {

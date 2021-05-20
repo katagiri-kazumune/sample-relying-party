@@ -14,11 +14,13 @@ import jp.classmethod.samplerelyingparty.config.BaristaAuthorizeConfiguration;
 import jp.classmethod.samplerelyingparty.config.BaristaUiConfiguration;
 import jp.classmethod.samplerelyingparty.exception.AuthorizationException;
 import jp.classmethod.samplerelyingparty.web.LoginUser;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /** barista でログイン した後の Callback. */
 @Path("/oauth")
+@RequiredArgsConstructor
 public class CallbackController {
 
     private final Logger log = LoggerFactory.getLogger(getClass());
@@ -34,17 +36,6 @@ public class CallbackController {
     @Context private HttpServletRequest request;
 
     @Context private HttpServletResponse httpServletResponse;
-
-    public CallbackController(
-            BaristaClient baristaClient,
-            GetUserApiClient getUserApiClient,
-            BaristaAuthorizeConfiguration baristaAuthorizeConfiguration,
-            BaristaUiConfiguration baristaUiConfiguration) {
-        this.baristaClient = baristaClient;
-        this.getUserApiClient = getUserApiClient;
-        this.baristaUiConfiguration = baristaUiConfiguration;
-        this.baristaAuthorizeConfiguration = baristaAuthorizeConfiguration;
-    }
 
     /**
      * ログイン後の callback.
@@ -76,8 +67,8 @@ public class CallbackController {
     }
 
     private String buildRedirectUri() {
-        return UriBuilder.fromUri(baristaUiConfiguration.getMfaRegistrationFormEndpoint)
-                .queryParam("client_id", baristaAuthorizeConfiguration.clientId)
+        return UriBuilder.fromUri(baristaUiConfiguration.getGetMfaRegistrationFormEndpoint())
+                .queryParam("client_id", baristaAuthorizeConfiguration.getClientId())
                 .queryParam("redirect_uri", "http://localhost:8888/mfa-config/callback")
                 .toTemplate();
     }

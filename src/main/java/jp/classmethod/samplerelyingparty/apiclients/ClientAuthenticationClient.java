@@ -10,7 +10,9 @@ import java.time.Duration;
 import javax.enterprise.context.ApplicationScoped;
 import jp.classmethod.samplerelyingparty.config.BaristaAuthorizeConfiguration;
 import jp.classmethod.samplerelyingparty.exception.AuthorizationException;
+import lombok.RequiredArgsConstructor;
 
+@RequiredArgsConstructor
 @ApplicationScoped
 public class ClientAuthenticationClient {
 
@@ -18,10 +20,6 @@ public class ClientAuthenticationClient {
             HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8);
 
     private final BaristaAuthorizeConfiguration baristaAuthorizeConfiguration;
-
-    public ClientAuthenticationClient(BaristaAuthorizeConfiguration baristaAuthorizeConfiguration) {
-        this.baristaAuthorizeConfiguration = baristaAuthorizeConfiguration;
-    }
 
     private String clientAccessToken;
 
@@ -41,13 +39,14 @@ public class ClientAuthenticationClient {
         var bodyString = "grant_type=client_credentials";
         try {
             var tokenEndpointRequest =
-                    HttpRequest.newBuilder(new URI(baristaAuthorizeConfiguration.tokenEndpoint))
+                    HttpRequest.newBuilder(
+                                    new URI(baristaAuthorizeConfiguration.getTokenEndpoint()))
                             .POST(HttpRequest.BodyPublishers.ofString(bodyString))
                             .header(
                                     "Authorization",
                                     HeaderHelper.buildAuthorizationValue(
-                                            baristaAuthorizeConfiguration.clientId,
-                                            baristaAuthorizeConfiguration.clientSecret))
+                                            baristaAuthorizeConfiguration.getClientId(),
+                                            baristaAuthorizeConfiguration.getClientSecret()))
                             .header("Content-Type", "application/x-www-form-urlencoded")
                             .timeout(Duration.ofSeconds(10))
                             .build();

@@ -9,9 +9,11 @@ import javax.ws.rs.core.Context;
 import jp.classmethod.samplerelyingparty.apiclients.BaristaClient;
 import jp.classmethod.samplerelyingparty.web.LoginUser;
 import jp.classmethod.samplerelyingparty.web.oauth.AuthorizationResult;
+import lombok.RequiredArgsConstructor;
 
 /** ユーザー登録後の Callback. */
 @Path("/signup")
+@RequiredArgsConstructor
 public class CallbackController {
 
     private final BaristaClient baristaClient;
@@ -19,10 +21,6 @@ public class CallbackController {
     @Context private HttpServletRequest request;
 
     @Context private HttpServletResponse httpServletResponse;
-
-    public CallbackController(BaristaClient baristaClient) {
-        this.baristaClient = baristaClient;
-    }
 
     /** ユーザー登録後の callback. */
     @GET

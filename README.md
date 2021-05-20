@@ -7,6 +7,7 @@
 barista に Client を登録します。
 (その Client の redirect_uri に
 
+* `http://localhost:8888/`
 * `http://localhost:8888/oauth/callback`
 * `http://localhost:8888/mfa-config/callback`
 
@@ -67,7 +68,7 @@ export BARISTA_UI_GET_MFA_REGISTRATION_FORM_ENDPOINT=${GetMfaRegistrationForm �
 ユーザーに EMAIL の MFA 設定がある時にログイン状態になります。
 (EMAIL の MFA 設定が無いと MFA 設定画面に遷移します)
 
-# フォーマット
+# フォーマットする時
 
 ```sh
 ./mvnw spotless:apply
