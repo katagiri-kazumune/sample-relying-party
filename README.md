@@ -73,3 +73,5 @@ export BARISTA_UI_GET_MFA_REGISTRATION_FORM_ENDPOINT=${GetMfaRegistrationForm �
 ```sh
 ./mvnw spotless:apply
 ```
+
+よろしく
