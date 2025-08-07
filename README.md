@@ -2,6 +2,7 @@
 
 ローカルに barista を構築します。
 
+
 ## Client 登録
 
 barista に Client を登録します。
